@@ -1,15 +1,37 @@
-FROM maven:3.9.8-amazoncorretto-21 AS build
+FROM eclipse-temurin:21-jre-alpine
 
-COPY /src /app/src
+RUN adduser -u 1000 spring -s /bin/sh -D spring
 
-COPY /pom.xml /app
+USER spring
 
-RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip
+WORKDIR /app
+#CMD java -jar /target/api-0.0.1-SNAPSHOT.jar
 
-FROM openjdk:24-slim-bullseye
+#CMD tail -f /dev/null
 
-EXPOSE 8080
 
-COPY --from=build /app/target/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+
+
+
+
+
+
+
+#FROM maven:3.9.8-amazoncorretto-21 AS builder
+#
+#WORKDIR /usr/app/
+#
+#COPY . .
+#
+#RUN mvn bootJar
+#
+#FROM eclipse-temurin:21-jre-alpine
+#
+#COPY --from=builder /usr/app/build/libs/*.jar /opt/app/application.jar
+#
+#RUN addgroup -S spring && adduser -S spring -G spring
+#USER spring:spring
+#
+#CMD java -jar /opt/app/application.jar

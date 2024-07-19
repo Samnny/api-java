@@ -1,3 +1,46 @@
 version: '3'
 
 services:
+  app:
+    build:
+      context: .
+    volumes:
+      - ./:/app
+    networks:
+      - api-java
+    entrypoint: sh -c "java -jar ./target/api-0.0.1-SNAPSHOT.jar"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+        - mysql-api-java:/var/lib/mysql
+    environment:
+        - MYSQL_DATABASE=vollmed_api
+        - MYSQL_USER=admin
+        - MYSQL_PASSWORD=admin
+        - MYSQL_ROOT_PASSWORD=root
+    networks:
+        - api-java
+    healthcheck:
+        test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padmin" ]
+        interval: 5s
+        timeout: 10s
+        retries: 3
+
+
+networks:
+  api-java:
+    driver: bridge
+
+volumes:
+  mysql-api-java:
+    driver: local
